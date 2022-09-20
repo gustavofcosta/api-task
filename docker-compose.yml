@@ -6,4 +6,26 @@ services:
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_NAME: ${DATA_NAME}
+    volumes:
+      - .docker/dbdata:var/lib/postgresql/data
+  app:
+    build: .
+    container_name: "api-task"
+    command: sh -c "yarn server"
+    ports:
+      - 4002:4002
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_HOST: ${DATABASE_HOST}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_NAME: ${DATA_NAME}
+
+    volumes:
+      - .:/usr/app
+    links:
+      - crud_db
+    depends_on:
+      - crud_db
